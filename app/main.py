@@ -8,7 +8,7 @@ class SimpleHandler(BaseHTTPRequestHandler):
         self.send_header("Content-type", "text/html; charset=utf-8")
         self.end_headers()
         # Este es el mensaje que cambiaremos para probar el pipeline
-        mensaje = "<h1 style='color:blue'>¡Versión 2.1 desplegada automáticamente con Jenkins! y con tildes arregladas</h1>"
+        mensaje = "<h1 style='color:red'>¡Versión 2.1 desplegada automáticamente con Jenkins! y con tildes arregladas</h1>"
         self.wfile.write(mensaje.encode("utf-8"))
 
 
