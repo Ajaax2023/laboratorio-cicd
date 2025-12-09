@@ -11,24 +11,25 @@ pipeline {
             }
         }
         
-        // --- NUEVA ETAPA DE TEST ---
-        stage('Test Unitario') {
-            steps {
-                echo 'Ejecutando pruebas de seguridad y lógica...'
-                // Usamos un contenedor temporal de python solo para correr el test
-                // Esto asegura que el entorno de prueba sea limpio e idéntico a producción
-                sh 'docker run --rm -v ${PWD}/app:/app -w /app python:3.9-slim python -m unittest test_logic.py'
-            }
-        }
-        
         stage('Construir Imagen') {
             steps {
+                // Primero construimos la imagen con TODO el código adentro
                 sh 'docker build -t aquatrans-image:latest .'
+            }
+        }
+
+        stage('Test Unitario') {
+            steps {
+                echo 'Ejecutando pruebas DENTRO de la imagen construida...'
+                // Usamos la imagen que acabamos de crear.
+                // Sobrescribimos el comando CMD para que en vez de iniciar el server, corra el test.
+                sh 'docker run --rm aquatrans-image:latest python -m unittest test_logic.py'
             }
         }
         
         stage('Desplegar') {
             steps {
+                // Si el test pasó, desplegamos la misma imagen
                 sh 'docker run -d --name aquatrans-v1 -p 9090:80 aquatrans-image:latest'
             }
         }
