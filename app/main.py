@@ -23,7 +23,7 @@ class SimpleHandler(BaseHTTPRequestHandler):
     def do_GET(self):
         self.send_response(200)
         self.send_header("Content-type", "text/html; charset=utf-8")
-        self.send_end_headers()
+        self.end_headers()
         # Llamamos a la función que genera el contenido
         self.wfile.write(obtener_mensaje_html())
 
