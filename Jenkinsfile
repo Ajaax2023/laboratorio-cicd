@@ -5,23 +5,30 @@ pipeline {
         stage('Limpieza Previa') {
             steps {
                 script {
-                    // El "|| true" evita que falle si el contenedor no existe (primera ejecución)
                     sh 'docker stop aquatrans-v1 || true'
                     sh 'docker rm aquatrans-v1 || true'
                 }
             }
         }
         
+        // --- NUEVA ETAPA DE TEST ---
+        stage('Test Unitario') {
+            steps {
+                echo 'Ejecutando pruebas de seguridad y lógica...'
+                // Usamos un contenedor temporal de python solo para correr el test
+                // Esto asegura que el entorno de prueba sea limpio e idéntico a producción
+                sh 'docker run --rm -v ${PWD}/app:/app -w /app python:3.9-slim python -m unittest test_logic.py'
+            }
+        }
+        
         stage('Construir Imagen') {
             steps {
-                // Construye la imagen usando el Dockerfile del repo descargado
                 sh 'docker build -t aquatrans-image:latest .'
             }
         }
         
         stage('Desplegar') {
             steps {
-                // Corre el contenedor en el puerto 9090
                 sh 'docker run -d --name aquatrans-v1 -p 9090:80 aquatrans-image:latest'
             }
         }
