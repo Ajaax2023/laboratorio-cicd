@@ -1,0 +1,16 @@
+services:
+  jenkins:
+    image: jenkins/jenkins:lts
+    container_name: jenkins-master
+    user: root # Importante: ejecutamos como root para tener acceso fácil al socket
+    ports:
+      - "8080:8080"   # Puerto web de Jenkins
+      - "50000:50000"
+    volumes:
+      - ./jenkins_data:/var/jenkins_home
+      # EL TRUCO DE MAGIA:
+      # Conectamos el "cerebro" de Docker de tu Kubuntu al interior de Jenkins
+      - /var/run/docker.sock:/var/run/docker.sock
+      # Mapeamos la carpeta del proyecto para que Jenkins pueda ver el código
+      # (En la vida real usarías git clone, aquí simulamos un repo local)
+      - ./app:/usr/src/app
